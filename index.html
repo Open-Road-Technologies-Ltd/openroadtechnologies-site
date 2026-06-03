@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open Road Technologies Ltd</title>
+<style>
+:root{
+  --bg:#070b16;
+  --panel:rgba(255,255,255,.075);
+  --border:rgba(255,255,255,.14);
+  --text:#f7fbff;
+  --muted:rgba(247,251,255,.68);
+  --accent:#57e6d9;
+  --accent2:#7ab8ff;
+  --accent3:#b892ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  min-height:100vh;
+  font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 15% 15%,rgba(87,230,217,.22),transparent 30%),
+    radial-gradient(circle at 82% 22%,rgba(122,184,255,.16),transparent 28%),
+    radial-gradient(circle at 50% 90%,rgba(184,146,255,.14),transparent 34%),
+    var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+.noise{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.06;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+}
+.map-layer{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  opacity:.16;
+  overflow:hidden;
+  mask-image:radial-gradient(circle at 55% 42%,black 0%,rgba(0,0,0,.78) 45%,transparent 86%);
+}
+.map-layer svg{
+  position:absolute;
+  width:120vw;
+  height:110vh;
+  left:-8vw;
+  top:-5vh;
+  animation:mapDrift 90s ease-in-out infinite alternate;
+  will-change:transform;
+}
+@keyframes mapDrift{
+  0%{transform:translate3d(0,0,0) scale(1)}
+  100%{transform:translate3d(-12px,-8px,0) scale(1.012)}
+}
+.map-layer .minor{
+  fill:none;
+  stroke:rgba(255,255,255,.18);
+  stroke-width:1;
+}
+.map-layer .major{
+  fill:none;
+  stroke:rgba(122,184,255,.26);
+  stroke-width:2.2;
+}
+.map-layer .road{
+  fill:none;
+  stroke:rgba(255,255,255,.24);
+  stroke-width:1.6;
+  stroke-linecap:round;
+}
+.map-layer .label{
+  fill:rgba(255,255,255,.24);
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:.08em;
+}
+.route-canvas{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+  z-index:0;
+  opacity:.92;
+}
+.compass{
+  position:fixed;
+  right:clamp(18px,5vw,70px);
+  bottom:clamp(18px,5vw,64px);
+  width:min(280px,42vw);
+  aspect-ratio:1;
+  z-index:0;
+  pointer-events:none;
+  opacity:.28;
+}
+.compass svg{
+  width:100%;
+  height:100%;
+  filter:drop-shadow(0 0 24px rgba(87,230,217,.18));
+  transform:rotate(var(--compass-rotate, 0deg)) scale(var(--compass-scale, 1));
+  transition:transform .28s ease-out;
+  will-change:transform;
+}
+.compass .ring{
+  fill:none;
+  stroke:rgba(255,255,255,.42);
+  stroke-width:1.2;
+}
+.compass .tick{
+  stroke:rgba(255,255,255,.38);
+  stroke-width:1;
+}
+.compass .needle{
+  fill:rgba(87,230,217,.52);
+}
+.compass .needle-alt{
+  fill:rgba(255,255,255,.22);
+}
+.compass text{
+  fill:rgba(255,255,255,.56);
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:.12em;
+}
+.shell{
+  position:relative;
+  z-index:1;
+  width:min(1180px,90vw);
+  margin:0 auto;
+}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:34px 0;
+}
+.logo{
+  font-size:.92rem;
+  letter-spacing:.2em;
+  font-weight:700;
+  color:rgba(255,255,255,.9);
+}
+.status{
+  padding:9px 14px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  color:var(--muted);
+  font-size:.9rem;
+  backdrop-filter:blur(14px);
+}
+.hero{
+  min-height:82vh;
+  display:flex;
+  align-items:center;
+}
+.hero-card{
+  width:min(860px,100%);
+  padding:42px;
+  border:1px solid var(--border);
+  border-radius:34px;
+  background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.035));
+  box-shadow:0 30px 100px rgba(0,0,0,.32);
+  backdrop-filter:blur(22px);
+}
+.kicker{
+  display:inline-flex;
+  gap:10px;
+  align-items:center;
+  padding:10px 16px;
+  border-radius:999px;
+  background:rgba(87,230,217,.1);
+  color:var(--accent);
+  border:1px solid rgba(87,230,217,.24);
+  margin-bottom:26px;
+}
+.kicker span{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 18px var(--accent);
+}
+h1{
+  font-size:clamp(3.3rem,7vw,6.9rem);
+  line-height:.95;
+  letter-spacing:-.07em;
+  margin-bottom:28px;
+}
+.gradient-text{
+  background:linear-gradient(110deg,var(--text),var(--accent),var(--accent2),var(--text));
+  background-size:220% 100%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shine 7s ease-in-out infinite;
+}
+@keyframes shine{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+.lede{
+  max-width:650px;
+  color:var(--muted);
+  font-size:1.28rem;
+  line-height:1.75;
+  margin-bottom:34px;
+}
+.actions{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  min-height:52px;
+  padding:0 24px;
+  border-radius:14px;
+  font-weight:700;
+}
+.primary{
+  color:#041014;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 16px 44px rgba(87,230,217,.2);
+}
+.secondary{
+  color:var(--text);
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.06);
+}
+.section{
+  padding:84px 0 108px;
+}
+.panel-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:22px;
+}
+.panel{
+  min-height:210px;
+  padding:28px;
+  border-radius:26px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  backdrop-filter:blur(18px);
+  transition:transform .35s ease,border-color .35s ease,background .35s ease;
+}
+.panel:hover{
+  transform:translateY(-7px);
+  border-color:rgba(87,230,217,.38);
+  background:rgba(255,255,255,.095);
+}
+.panel h3{
+  font-size:1.25rem;
+  margin-bottom:12px;
+}
+.panel p{
+  color:var(--muted);
+  line-height:1.65;
+}
+footer{
+  position:relative;
+  z-index:1;
+  width:min(1180px,90vw);
+  margin:0 auto;
+  padding:42px 0 64px;
+  border-top:1px solid rgba(255,255,255,.1);
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+  color:var(--muted);
+}
+footer a{
+  color:var(--accent);
+  text-decoration:none;
+}
+@media(max-width:860px){
+  .hero-card{padding:28px;border-radius:26px}
+  .panel-grid{grid-template-columns:1fr}
+  h1{font-size:clamp(3rem,16vw,5rem)}
+  .map-layer{opacity:.12}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .route-canvas{display:none}
+  .map-layer svg{animation:none!important}
+}
+</style>
+</head>
+<body>
+<div class="map-layer" aria-hidden="true">
+  <svg viewBox="0 0 1600 950" preserveAspectRatio="xMidYMid slice">
+    <g class="contours">
+      <path class="minor" d="M-80 120 C120 30 260 175 470 90 C680 8 790 165 1010 92 C1190 35 1370 92 1680 30"/>
+      <path class="minor" d="M-70 210 C150 115 300 265 500 185 C720 96 850 265 1060 185 C1245 115 1390 185 1680 110"/>
+      <path class="minor" d="M-90 320 C135 220 330 380 545 285 C760 190 910 365 1110 275 C1300 190 1450 285 1690 205"/>
+      <path class="minor" d="M-80 440 C140 315 345 505 570 395 C795 285 940 475 1160 370 C1340 285 1480 405 1690 310"/>
+      <path class="minor" d="M-100 565 C125 450 360 640 590 530 C835 410 975 620 1200 505 C1370 415 1510 535 1710 445"/>
+      <path class="minor" d="M-80 710 C160 595 390 790 640 665 C850 560 1010 760 1235 650 C1420 560 1520 690 1700 610"/>
+      <path class="minor" d="M150 -90 C75 120 240 230 170 430 C95 635 250 710 185 980"/>
+      <path class="minor" d="M350 -90 C270 140 455 250 370 465 C290 670 480 760 405 990"/>
+      <path class="minor" d="M580 -90 C495 145 710 275 610 505 C520 705 730 800 660 1010"/>
+      <path class="minor" d="M820 -90 C735 130 940 275 850 510 C765 725 960 790 890 1010"/>
+      <path class="minor" d="M1080 -90 C995 145 1200 270 1120 500 C1045 720 1220 815 1170 1010"/>
+      <path class="minor" d="M1320 -90 C1245 125 1420 250 1350 485 C1280 710 1450 810 1410 1010"/>
+    </g>
+    <g class="roads">
+      <path class="major" d="M-120 690 C120 560 240 610 420 475 C600 340 760 360 920 245 C1090 125 1265 165 1710 50"/>
+      <path class="road" d="M40 785 C240 680 315 720 470 610 C640 490 760 545 930 420 C1100 295 1230 340 1505 210"/>
+      <path class="road" d="M140 275 C320 370 450 280 610 390 C780 510 930 435 1080 545 C1220 650 1390 570 1580 690"/>
+      <path class="road" d="M250 900 C340 720 455 675 515 520 C575 360 700 280 780 120"/>
+      <path class="road" d="M1030 910 C970 720 1040 615 1000 455 C955 285 1060 175 1185 -20"/>
+      <path class="major" d="M-80 455 C170 415 310 350 520 385 C780 430 900 310 1130 330 C1345 350 1460 280 1700 300"/>
+    </g>
+    <g class="places">
+      <text class="label" x="410" y="505">A49</text>
+      <text class="label" x="748" y="348">A5</text>
+      <text class="label" x="1010" y="265">M54</text>
+      <text class="label" x="1135" y="590">A44</text>
+      <text class="label" x="610" y="690">B4368</text>
+    </g>
+  </svg>
+</div>
+
+<canvas class="route-canvas" id="routeCanvas" aria-hidden="true"></canvas>
+
+<div class="compass" aria-hidden="true">
+  <svg viewBox="0 0 260 260">
+    <circle class="ring" cx="130" cy="130" r="112"/>
+    <circle class="ring" cx="130" cy="130" r="82"/>
+    <line class="tick" x1="130" y1="12" x2="130" y2="34"/>
+    <line class="tick" x1="130" y1="226" x2="130" y2="248"/>
+    <line class="tick" x1="12" y1="130" x2="34" y2="130"/>
+    <line class="tick" x1="226" y1="130" x2="248" y2="130"/>
+    <line class="tick" x1="47" y1="47" x2="62" y2="62"/>
+    <line class="tick" x1="198" y1="198" x2="213" y2="213"/>
+    <line class="tick" x1="213" y1="47" x2="198" y2="62"/>
+    <line class="tick" x1="62" y1="198" x2="47" y2="213"/>
+    <polygon class="needle" points="130,35 148,130 130,225 112,130"/>
+    <polygon class="needle-alt" points="35,130 130,112 225,130 130,148"/>
+    <circle cx="130" cy="130" r="7" fill="rgba(255,255,255,.55)"/>
+    <text x="130" y="28" text-anchor="middle">N</text>
+    <text x="130" y="246" text-anchor="middle">S</text>
+    <text x="27" y="136" text-anchor="middle">W</text>
+    <text x="233" y="136" text-anchor="middle">E</text>
+  </svg>
+</div>
+
+<div class="noise"></div>
+
+<div class="shell">
+  <header>
+    <div class="logo">OPEN ROAD TECHNOLOGIES</div>
+    <div class="status">UK Software Company</div>
+  </header>
+
+  <main class="hero">
+    <section class="hero-card">
+      <div class="kicker"><span></span> Independent software studio</div>
+      <h1>Technology for <span class="gradient-text">the journey ahead</span></h1>
+      <p class="lede">
+        Open Road Technologies Ltd builds thoughtful digital products for people who move,
+        explore and experience the world beyond the screen.
+      </p>
+      <div class="actions">
+        <a class="btn primary" href="mailto:hello@openroadtechnologies.co.uk">hello@openroadtechnologies.co.uk</a>
+        <a class="btn secondary" href="#work">What we do</a>
+      </div>
+    </section>
+  </main>
+
+  <section class="section" id="work">
+    <div class="panel-grid">
+      <article class="panel">
+        <h3>Discover</h3>
+        <p>We explore how technology can reveal useful detail at the right moment, helping people notice more, understand more and move with greater confidence.</p>
+      </article>
+      <article class="panel">
+        <h3>Navigate</h3>
+        <p>Our products are designed for real-world use: clear, resilient and practical when conditions change, signal drops or plans take an unexpected turn.</p>
+      </article>
+      <article class="panel">
+        <h3>Experience</h3>
+        <p>We are building quietly ambitious tools for journeys, discovery and independent movement, with a focus on simplicity, trust and a sense of place.</p>
+      </article>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div>Open Road Technologies Ltd</div>
+  <a href="mailto:hello@openroadtechnologies.co.uk">hello@openroadtechnologies.co.uk</a>
+</footer>
+
+
+<script>
+(() => {
+  const compass = document.querySelector(".compass");
+  if (!compass) return;
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) return;
+
+  let targetRotate = 0;
+  let targetScale = 1;
+  let currentRotate = 0;
+  let currentScale = 1;
+  let raf = null;
+
+  function animate() {
+    currentRotate += (targetRotate - currentRotate) * 0.12;
+    currentScale += (targetScale - currentScale) * 0.10;
+
+    compass.style.setProperty("--compass-rotate", currentRotate.toFixed(3) + "deg");
+    compass.style.setProperty("--compass-scale", currentScale.toFixed(4));
+
+    if (
+      Math.abs(targetRotate - currentRotate) > 0.02 ||
+      Math.abs(targetScale - currentScale) > 0.002
+    ) {
+      raf = requestAnimationFrame(animate);
+    } else {
+      raf = null;
+    }
+  }
+
+  function update(event) {
+    const x = event.clientX / Math.max(window.innerWidth, 1);
+    const y = event.clientY / Math.max(window.innerHeight, 1);
+
+    targetRotate = ((x - 0.5) * 18) + ((0.5 - y) * 8);
+    targetScale = 1.035;
+
+    if (!raf) raf = requestAnimationFrame(animate);
+  }
+
+  function reset() {
+    targetRotate = 0;
+    targetScale = 1;
+    if (!raf) raf = requestAnimationFrame(animate);
+  }
+
+  window.addEventListener("pointermove", update, { passive: true });
+  window.addEventListener("mouseout", reset, { passive: true });
+  window.addEventListener("blur", reset, { passive: true });
+})();
+</script>
+
+<script>
+(() => {
+  const canvas = document.getElementById("routeCanvas");
+  const ctx = canvas.getContext("2d", { alpha: true });
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReducedMotion) return;
+
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+
+  const routes = [
+    {
+      alpha: 0.88,
+      width: 2.6,
+      delay: 0,
+      points: [
+        [-0.18, 0.70], [0.08, 0.48], [0.22, 0.56], [0.36, 0.31],
+        [0.50, 0.07], [0.66, 0.18], [0.82, 0.22], [1.18, 0.03]
+      ]
+    },
+    {
+      alpha: 0.44,
+      width: 1.9,
+      delay: 0.12,
+      points: [
+        [-0.18, 0.76], [0.04, 0.64], [0.18, 0.70], [0.33, 0.52],
+        [0.46, 0.35], [0.59, 0.40], [0.74, 0.28], [1.16, 0.16]
+      ]
+    },
+    {
+      alpha: 0.34,
+      width: 1.6,
+      delay: 0.22,
+      points: [
+        [-0.16, 0.58], [0.05, 0.55], [0.20, 0.39], [0.34, 0.43],
+        [0.49, 0.50], [0.58, 0.66], [0.73, 0.57], [1.14, 0.43]
+      ]
+    },
+    {
+      alpha: 0.40,
+      width: 1.8,
+      delay: 0.32,
+      points: [
+        [-0.14, 0.83], [0.07, 0.78], [0.19, 0.85], [0.34, 0.70],
+        [0.49, 0.54], [0.64, 0.72], [0.79, 0.60], [1.14, 0.52]
+      ]
+    }
+  ];
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function point(route, t) {
+    const pts = route.points;
+    const scaled = t * (pts.length - 1);
+    const i = Math.min(Math.floor(scaled), pts.length - 2);
+    const local = scaled - i;
+
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[Math.min(pts.length - 1, i + 2)];
+
+    const tt = local * local;
+    const ttt = tt * local;
+
+    const x = 0.5 * (
+      (2 * p1[0]) +
+      (-p0[0] + p2[0]) * local +
+      (2*p0[0] - 5*p1[0] + 4*p2[0] - p3[0]) * tt +
+      (-p0[0] + 3*p1[0] - 3*p2[0] + p3[0]) * ttt
+    );
+
+    const y = 0.5 * (
+      (2 * p1[1]) +
+      (-p0[1] + p2[1]) * local +
+      (2*p0[1] - 5*p1[1] + 4*p2[1] - p3[1]) * tt +
+      (-p0[1] + 3*p1[1] - 3*p2[1] + p3[1]) * ttt
+    );
+
+    return [x * width, y * height];
+  }
+
+  function drawRoute(route, progress) {
+    const p = Math.max(0, Math.min(1, progress));
+    const samples = 170;
+    const visible = Math.floor(samples * p);
+
+    if (visible < 2) return;
+
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    // Soft base route, already present but faint, so progression feels continuous.
+    ctx.beginPath();
+    for (let i = 0; i <= samples; i++) {
+      const [x, y] = point(route, i / samples);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = `rgba(87,230,217,${route.alpha * 0.13})`;
+    ctx.lineWidth = route.width;
+    ctx.stroke();
+
+    // Drawn progress.
+    const grad = ctx.createLinearGradient(0, 0, width, height);
+    grad.addColorStop(0, `rgba(87,230,217,${route.alpha})`);
+    grad.addColorStop(0.52, `rgba(122,184,255,${route.alpha})`);
+    grad.addColorStop(1, `rgba(184,146,255,${route.alpha})`);
+
+    ctx.shadowColor = "rgba(87,230,217,.35)";
+    ctx.shadowBlur = 9;
+    ctx.beginPath();
+    for (let i = 0; i <= visible; i++) {
+      const [x, y] = point(route, i / samples);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = route.width;
+    ctx.stroke();
+
+    // A very subtle leading glow, not a dot.
+    const [hx, hy] = point(route, p);
+    const glow = ctx.createRadialGradient(hx, hy, 0, hx, hy, 55);
+    glow.addColorStop(0, `rgba(87,230,217,${route.alpha * 0.20})`);
+    glow.addColorStop(1, "rgba(87,230,217,0)");
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(hx, hy, 55, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  function frame(now) {
+    ctx.clearRect(0, 0, width, height);
+
+    const cycle = 15500;
+    const raw = (now % cycle) / cycle;
+
+    for (const route of routes) {
+      let p = (raw - route.delay) / 0.74;
+      if (p < 0) p += 1.35;
+      if (p > 1) p = 1;
+      drawRoute(route, easeInOutCubic(p));
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  resize();
+  window.addEventListener("resize", resize, { passive: true });
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
