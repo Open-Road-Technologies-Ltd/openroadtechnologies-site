@@ -470,6 +470,7 @@ footer a{
       alpha: 0.88,
       width: 2.6,
       delay: 0,
+      stops: [0.18, 0.36, 0.58, 0.76],
       points: [
         [-0.18, 0.70], [0.08, 0.48], [0.22, 0.56], [0.36, 0.31],
         [0.50, 0.07], [0.66, 0.18], [0.82, 0.22], [1.18, 0.03]
@@ -479,6 +480,7 @@ footer a{
       alpha: 0.44,
       width: 1.9,
       delay: 0.12,
+      stops: [0.22, 0.49, 0.71],
       points: [
         [-0.18, 0.76], [0.04, 0.64], [0.18, 0.70], [0.33, 0.52],
         [0.46, 0.35], [0.59, 0.40], [0.74, 0.28], [1.16, 0.16]
@@ -488,6 +490,7 @@ footer a{
       alpha: 0.34,
       width: 1.6,
       delay: 0.22,
+      stops: [0.25, 0.52, 0.80],
       points: [
         [-0.16, 0.58], [0.05, 0.55], [0.20, 0.39], [0.34, 0.43],
         [0.49, 0.50], [0.58, 0.66], [0.73, 0.57], [1.14, 0.43]
@@ -497,6 +500,7 @@ footer a{
       alpha: 0.40,
       width: 1.8,
       delay: 0.32,
+      stops: [0.20, 0.44, 0.64, 0.82],
       points: [
         [-0.14, 0.83], [0.07, 0.78], [0.19, 0.85], [0.34, 0.70],
         [0.49, 0.54], [0.64, 0.72], [0.79, 0.60], [1.14, 0.52]
@@ -513,10 +517,6 @@ footer a{
     canvas.style.width = width + "px";
     canvas.style.height = height + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-
-  function lerp(a, b, t) {
-    return a + (b - a) * t;
   }
 
   function point(route, t) {
@@ -550,6 +550,33 @@ footer a{
     return [x * width, y * height];
   }
 
+  function drawStops(route, progress) {
+    for (const stop of route.stops) {
+      const [x, y] = point(route, stop);
+
+      const distance = Math.abs(progress - stop);
+      const hit = Math.max(0, 1 - distance / 0.035);
+      const pulse = Math.sin(hit * Math.PI);
+
+      const radius = 2.8 + pulse * 12;
+      const alpha = route.alpha * (0.35 + pulse * 0.65);
+
+      ctx.save();
+      ctx.shadowColor = "rgba(87,230,217,.55)";
+      ctx.shadowBlur = 12 + pulse * 20;
+      ctx.strokeStyle = `rgba(87,230,217,${alpha})`;
+      ctx.fillStyle = `rgba(7,11,22,${0.45 + pulse * 0.25})`;
+      ctx.lineWidth = 1.4 + pulse * 0.9;
+
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.restore();
+    }
+  }
+
   function drawRoute(route, progress) {
     const p = Math.max(0, Math.min(1, progress));
     const samples = 170;
@@ -561,7 +588,6 @@ footer a{
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
-    // Soft base route, already present but faint, so progression feels continuous.
     ctx.beginPath();
     for (let i = 0; i <= samples; i++) {
       const [x, y] = point(route, i / samples);
@@ -572,7 +598,6 @@ footer a{
     ctx.lineWidth = route.width;
     ctx.stroke();
 
-    // Drawn progress.
     const grad = ctx.createLinearGradient(0, 0, width, height);
     grad.addColorStop(0, `rgba(87,230,217,${route.alpha})`);
     grad.addColorStop(0.52, `rgba(122,184,255,${route.alpha})`);
@@ -590,14 +615,23 @@ footer a{
     ctx.lineWidth = route.width;
     ctx.stroke();
 
-    // A very subtle leading glow, not a dot.
+    drawStops(route, p);
+
     const [hx, hy] = point(route, p);
+
     const glow = ctx.createRadialGradient(hx, hy, 0, hx, hy, 55);
     glow.addColorStop(0, `rgba(87,230,217,${route.alpha * 0.20})`);
     glow.addColorStop(1, "rgba(87,230,217,0)");
     ctx.fillStyle = glow;
     ctx.beginPath();
     ctx.arc(hx, hy, 55, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = `rgba(247,251,255,${route.alpha})`;
+    ctx.shadowColor = "rgba(87,230,217,.75)";
+    ctx.shadowBlur = 14;
+    ctx.beginPath();
+    ctx.arc(hx, hy, 3.8, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.restore();
