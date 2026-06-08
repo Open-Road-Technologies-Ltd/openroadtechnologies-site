@@ -58,22 +58,39 @@ body{
 @keyframes mapDrift{
   0%{transform:rotate(-18deg) skewX(-18deg) scaleY(.55) translate3d(0,0,0)}
   100%{transform:rotate(-18deg) skewX(-18deg) scaleY(.55) translate3d(-18px,-10px,0)}
-}
-.map-layer .minor{
-  fill:none;
-  stroke:rgba(255,255,255,.18);
-  stroke-width:1;
-}
 .map-layer .major{
+
   fill:none;
-  stroke:rgba(122,184,255,.26);
-  stroke-width:2.2;
-}
-.map-layer .road{
-  fill:none;
-  stroke:rgba(255,255,255,.24);
-  stroke-width:1.6;
+
+  stroke:rgba(190,225,255,.34);
+
+  stroke-width:4;
+
   stroke-linecap:round;
+
+}
+
+.map-layer .road{
+
+  fill:none;
+
+  stroke:rgba(230,245,255,.16);
+
+  stroke-width:2;
+
+  stroke-linecap:round;
+
+}
+
+.map-layer .node{
+
+  fill:rgba(230,245,255,.35);
+
+  stroke:rgba(87,230,217,.45);
+
+  stroke-width:2;
+
+}
 }
 .map-layer .label{
   fill:rgba(255,255,255,.24);
@@ -297,37 +314,31 @@ footer a{
 }
 </style>
 </head>
-<body>
 <div class="map-layer" aria-hidden="true">
   <svg viewBox="0 0 1600 950" preserveAspectRatio="xMidYMid slice">
-    <g class="contours">
-      <path class="minor" d="M-80 120 C120 30 260 175 470 90 C680 8 790 165 1010 92 C1190 35 1370 92 1680 30"/>
-      <path class="minor" d="M-70 210 C150 115 300 265 500 185 C720 96 850 265 1060 185 C1245 115 1390 185 1680 110"/>
-      <path class="minor" d="M-90 320 C135 220 330 380 545 285 C760 190 910 365 1110 275 C1300 190 1450 285 1690 205"/>
-      <path class="minor" d="M-80 440 C140 315 345 505 570 395 C795 285 940 475 1160 370 C1340 285 1480 405 1690 310"/>
-      <path class="minor" d="M-100 565 C125 450 360 640 590 530 C835 410 975 620 1200 505 C1370 415 1510 535 1710 445"/>
-      <path class="minor" d="M-80 710 C160 595 390 790 640 665 C850 560 1010 760 1235 650 C1420 560 1520 690 1700 610"/>
-      <path class="minor" d="M150 -90 C75 120 240 230 170 430 C95 635 250 710 185 980"/>
-      <path class="minor" d="M350 -90 C270 140 455 250 370 465 C290 670 480 760 405 990"/>
-      <path class="minor" d="M580 -90 C495 145 710 275 610 505 C520 705 730 800 660 1010"/>
-      <path class="minor" d="M820 -90 C735 130 940 275 850 510 C765 725 960 790 890 1010"/>
-      <path class="minor" d="M1080 -90 C995 145 1200 270 1120 500 C1045 720 1220 815 1170 1010"/>
-      <path class="minor" d="M1320 -90 C1245 125 1420 250 1350 485 C1280 710 1450 810 1410 1010"/>
-    </g>
     <g class="roads">
-      <path class="major" d="M-120 690 C120 560 240 610 420 475 C600 340 760 360 920 245 C1090 125 1265 165 1710 50"/>
-      <path class="road" d="M40 785 C240 680 315 720 470 610 C640 490 760 545 930 420 C1100 295 1230 340 1505 210"/>
-      <path class="road" d="M140 275 C320 370 450 280 610 390 C780 510 930 435 1080 545 C1220 650 1390 570 1580 690"/>
-      <path class="road" d="M250 900 C340 720 455 675 515 520 C575 360 700 280 780 120"/>
-      <path class="road" d="M1030 910 C970 720 1040 615 1000 455 C955 285 1060 175 1185 -20"/>
-      <path class="major" d="M-80 455 C170 415 310 350 520 385 C780 430 900 310 1130 330 C1345 350 1460 280 1700 300"/>
+      <path class="road" d="M-100 720 L260 560 L620 400 L980 240 L1340 80 L1700 -80"/>
+      <path class="road" d="M-100 820 L260 660 L620 500 L980 340 L1340 180 L1700 20"/>
+      <path class="road" d="M-100 620 L260 460 L620 300 L980 140 L1340 -20"/>
+      <path class="road" d="M180 980 L420 780 L660 580 L900 380 L1140 180 L1380 -20"/>
+      <path class="road" d="M420 980 L660 780 L900 580 L1140 380 L1380 180 L1620 -20"/>
+
+      <path class="road" d="M-80 180 L300 340 L680 500 L1060 660 L1440 820 L1820 980"/>
+      <path class="road" d="M-80 300 L300 460 L680 620 L1060 780 L1440 940"/>
+      <path class="road" d="M-80 60 L300 220 L680 380 L1060 540 L1440 700 L1820 860"/>
+      <path class="road" d="M200 -80 L520 80 L840 240 L1160 400 L1480 560 L1800 720"/>
+      <path class="road" d="M480 -80 L800 80 L1120 240 L1440 400 L1760 560"/>
+
+      <path class="major" d="M-80 760 L220 630 L500 510 L760 390 L1040 270 L1380 120 L1700 -20"/>
+      <path class="major" d="M120 930 L360 720 L600 540 L840 360 L1080 180 L1320 0"/>
     </g>
-    <g class="places">
-      <text class="label" x="410" y="505">A49</text>
-      <text class="label" x="748" y="348">A5</text>
-      <text class="label" x="1010" y="265">M54</text>
-      <text class="label" x="1135" y="590">A44</text>
-      <text class="label" x="610" y="690">B4368</text>
+
+    <g class="nodes">
+      <circle class="node" cx="500" cy="510" r="7"/>
+      <circle class="node" cx="760" cy="390" r="7"/>
+      <circle class="node" cx="1040" cy="270" r="7"/>
+      <circle class="node" cx="600" cy="540" r="5"/>
+      <circle class="node" cx="840" cy="360" r="5"/>
     </g>
   </svg>
 </div>
