@@ -40,22 +40,24 @@ body{
   inset:0;
   pointer-events:none;
   z-index:0;
-  opacity:.16;
+  opacity:.18;
   overflow:hidden;
   mask-image:radial-gradient(circle at 55% 42%,black 0%,rgba(0,0,0,.78) 45%,transparent 86%);
 }
 .map-layer svg{
   position:absolute;
-  width:120vw;
-  height:110vh;
-  left:-8vw;
-  top:-5vh;
+  width:150vw;
+  height:120vh;
+  left:-24vw;
+  top:-18vh;
+  transform:rotate(-18deg) skewX(-18deg) scaleY(.55);
+  transform-origin:center;
   animation:mapDrift 90s ease-in-out infinite alternate;
   will-change:transform;
 }
 @keyframes mapDrift{
-  0%{transform:translate3d(0,0,0) scale(1)}
-  100%{transform:translate3d(-12px,-8px,0) scale(1.012)}
+  0%{transform:rotate(-18deg) skewX(-18deg) scaleY(.55) translate3d(0,0,0)}
+  100%{transform:rotate(-18deg) skewX(-18deg) scaleY(.55) translate3d(-18px,-10px,0)}
 }
 .map-layer .minor{
   fill:none;
@@ -86,7 +88,7 @@ body{
   height:100vh;
   pointer-events:none;
   z-index:0;
-  opacity:.92;
+  opacity:.82;
 }
 .compass{
   position:fixed;
@@ -286,7 +288,7 @@ footer a{
   .hero-card{padding:28px;border-radius:26px}
   .panel-grid{grid-template-columns:1fr}
   h1{font-size:clamp(3rem,16vw,5rem)}
-  .map-layer{opacity:.12}
+  .map-layer{opacity:.14}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
@@ -378,29 +380,27 @@ footer a{
   </main>
 
   <section class="section" id="work">
-  <div class="panel-grid">
-    <article class="panel">
-      <h3>Discover</h3>
-      <p>Every journey contains stories, knowledge and opportunities that often go unnoticed. We build technology that brings them to the surface.</p>
-    </article>
-    <article class="panel">
-      <h3>Navigate</h3>
-      <p>Movement should feel simple. Whether travelling across a country or exploring somewhere new, information should arrive naturally and at the right moment.</p>
-    </article>
-    <article class="panel">
-      <h3>Experience</h3>
-      <p>We create location-aware products that transform how people explore, learn and travel.</p>
-    </article>
-  </div>
-</section>
-
+    <div class="panel-grid">
+      <article class="panel">
+        <h3>Discover</h3>
+        <p>Every journey contains stories, knowledge and opportunities that often go unnoticed. We build technology that brings them to the surface.</p>
+      </article>
+      <article class="panel">
+        <h3>Navigate</h3>
+        <p>Movement should feel simple. Whether travelling across a country or exploring somewhere new, information should arrive naturally and at the right moment.</p>
+      </article>
+      <article class="panel">
+        <h3>Experience</h3>
+        <p>We create location-aware products that transform how people explore, learn and travel.</p>
+      </article>
+    </div>
+  </section>
 </div>
 
 <footer>
   <div>Open Road Technologies Ltd</div>
   <a href="mailto:hello@openroadtechnologies.co.uk">hello@openroadtechnologies.co.uk</a>
 </footer>
-
 
 <script>
 (() => {
@@ -467,56 +467,48 @@ footer a{
   let dpr = 1;
 
   const routes = [
-  {
-    alpha: 0.18,
-    width: 1.1,
-    delay: 0.00,
-    stops: [],
-    points: [[-0.10,0.72],[0.12,0.66],[0.34,0.60],[0.56,0.54],[0.78,0.48],[1.10,0.40]]
-  },
-  {
-    alpha: 0.16,
-    width: 1.0,
-    delay: 0.04,
-    stops: [],
-    points: [[-0.08,0.82],[0.15,0.76],[0.38,0.70],[0.62,0.64],[0.86,0.58],[1.12,0.50]]
-  },
-  {
-    alpha: 0.14,
-    width: 1.0,
-    delay: 0.08,
-    stops: [],
-    points: [[-0.06,0.60],[0.18,0.54],[0.42,0.48],[0.66,0.42],[0.90,0.36],[1.14,0.28]]
-  },
-  {
-    alpha: 0.13,
-    width: 1.0,
-    delay: 0.12,
-    stops: [],
-    points: [[0.10,0.92],[0.18,0.76],[0.26,0.60],[0.34,0.44],[0.42,0.28],[0.50,0.08]]
-  },
-  {
-    alpha: 0.13,
-    width: 1.0,
-    delay: 0.16,
-    stops: [],
-    points: [[0.34,0.96],[0.42,0.80],[0.50,0.64],[0.58,0.48],[0.66,0.32],[0.74,0.12]]
-  },
-  {
-    alpha: 0.13,
-    width: 1.0,
-    delay: 0.20,
-    stops: [],
-    points: [[0.58,0.98],[0.66,0.82],[0.74,0.66],[0.82,0.50],[0.90,0.34],[0.98,0.14]]
-  },
-  {
-    alpha: 0.86,
-    width: 2.4,
-    delay: 0.00,
-    stops: [0.20, 0.40, 0.62, 0.80],
-    points: [[0.06,0.78],[0.20,0.70],[0.32,0.63],[0.45,0.56],[0.58,0.49],[0.72,0.42],[0.88,0.34]]
-  }
-];
+    {
+      alpha: 0.88,
+      width: 2.6,
+      delay: 0,
+      stops: [0.18, 0.36, 0.58, 0.76],
+      points: [
+        [-0.18, 0.70], [0.08, 0.48], [0.22, 0.56], [0.36, 0.31],
+        [0.50, 0.07], [0.66, 0.18], [0.82, 0.22], [1.18, 0.03]
+      ]
+    },
+    {
+      alpha: 0.44,
+      width: 1.9,
+      delay: 0.12,
+      stops: [0.22, 0.49, 0.71],
+      points: [
+        [-0.18, 0.76], [0.04, 0.64], [0.18, 0.70], [0.33, 0.52],
+        [0.46, 0.35], [0.59, 0.40], [0.74, 0.28], [1.16, 0.16]
+      ]
+    },
+    {
+      alpha: 0.34,
+      width: 1.6,
+      delay: 0.22,
+      stops: [0.25, 0.52, 0.80],
+      points: [
+        [-0.16, 0.58], [0.05, 0.55], [0.20, 0.39], [0.34, 0.43],
+        [0.49, 0.50], [0.58, 0.66], [0.73, 0.57], [1.14, 0.43]
+      ]
+    },
+    {
+      alpha: 0.40,
+      width: 1.8,
+      delay: 0.32,
+      stops: [0.20, 0.44, 0.64, 0.82],
+      points: [
+        [-0.14, 0.83], [0.07, 0.78], [0.19, 0.85], [0.34, 0.70],
+        [0.49, 0.54], [0.64, 0.72], [0.79, 0.60], [1.14, 0.52]
+      ]
+    }
+  ];
+
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     width = window.innerWidth;
@@ -556,60 +548,60 @@ footer a{
       (-p0[1] + 3*p1[1] - 3*p2[1] + p3[1]) * ttt
     );
 
-   return [x * width, y * height];
+    return [x * width, y * height];
   }
 
   function drawStops(route, progress) {
-  for (const stop of route.stops) {
-    const [x, y] = point(route, stop);
+    for (const stop of route.stops) {
+      const [x, y] = point(route, stop);
 
-    const passed = progress >= stop;
-    const age = progress - stop;
+      const passed = progress >= stop;
+      const age = progress - stop;
 
-    const rippleLife = 0.045;
-    const rippleProgress =
-      passed && age < rippleLife
-        ? age / rippleLife
-        : null;
+      const rippleLife = 0.045;
+      const rippleProgress =
+        passed && age < rippleLife
+          ? age / rippleLife
+          : null;
 
-    const baseAlpha = route.alpha * 0.32;
+      const baseAlpha = route.alpha * 0.32;
 
-    ctx.save();
+      ctx.save();
 
-    ctx.fillStyle = `rgba(87,230,217,${baseAlpha})`;
-    ctx.beginPath();
-    ctx.arc(x, y, 2.8, 0, Math.PI * 2);
-    ctx.fill();
-
-    if (rippleProgress !== null) {
-      const eased = 1 - Math.pow(1 - rippleProgress, 3);
-      const rippleRadius = 4 + eased * 28;
-      const rippleAlpha = route.alpha * (1 - rippleProgress) * 0.72;
-
-      ctx.shadowColor = "rgba(87,230,217,.55)";
-      ctx.shadowBlur = 14;
-
-      ctx.strokeStyle = `rgba(87,230,217,${rippleAlpha})`;
-      ctx.lineWidth = 1.8 * (1 - rippleProgress) + 0.4;
-
+      ctx.fillStyle = `rgba(87,230,217,${baseAlpha})`;
       ctx.beginPath();
-      ctx.arc(x, y, rippleRadius, 0, Math.PI * 2);
-      ctx.stroke();
-
-      const glow = ctx.createRadialGradient(x, y, 0, x, y, rippleRadius);
-      glow.addColorStop(0, `rgba(87,230,217,${rippleAlpha * 0.18})`);
-      glow.addColorStop(0.55, `rgba(87,230,217,${rippleAlpha * 0.08})`);
-      glow.addColorStop(1, "rgba(87,230,217,0)");
-
-      ctx.fillStyle = glow;
-      ctx.beginPath();
-      ctx.arc(x, y, rippleRadius, 0, Math.PI * 2);
+      ctx.arc(x, y, 2.8, 0, Math.PI * 2);
       ctx.fill();
-    }
 
-    ctx.restore();
+      if (rippleProgress !== null) {
+        const eased = 1 - Math.pow(1 - rippleProgress, 3);
+        const rippleRadius = 4 + eased * 28;
+        const rippleAlpha = route.alpha * (1 - rippleProgress) * 0.72;
+
+        ctx.shadowColor = "rgba(87,230,217,.55)";
+        ctx.shadowBlur = 14;
+
+        ctx.strokeStyle = `rgba(87,230,217,${rippleAlpha})`;
+        ctx.lineWidth = 1.8 * (1 - rippleProgress) + 0.4;
+
+        ctx.beginPath();
+        ctx.arc(x, y, rippleRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, rippleRadius);
+        glow.addColorStop(0, `rgba(87,230,217,${rippleAlpha * 0.18})`);
+        glow.addColorStop(0.55, `rgba(87,230,217,${rippleAlpha * 0.08})`);
+        glow.addColorStop(1, "rgba(87,230,217,0)");
+
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y, rippleRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
   }
-}
 
   function drawRoute(route, progress) {
     const p = Math.max(0, Math.min(1, progress));
@@ -628,7 +620,7 @@ footer a{
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
-    ctx.strokeStyle = `rgba(225,240,255,${route.alpha})`;
+    ctx.strokeStyle = `rgba(225,240,255,${route.alpha * 0.13})`;
     ctx.lineWidth = route.width;
     ctx.stroke();
 
