@@ -556,29 +556,48 @@ footer a{
     const [x, y] = point(route, stop);
 
     const passed = progress >= stop;
-    const distanceAfterHit = progress - stop;
+    const age = progress - stop;
 
-    const hit =
-      passed && distanceAfterHit < 0.018
-        ? 1 - distanceAfterHit / 0.018
-        : 0;
+    const rippleLife = 0.045;
+    const rippleProgress =
+      passed && age < rippleLife
+        ? age / rippleLife
+        : null;
 
-    const pulse = Math.sin(hit * Math.PI);
-
-    const radius = hit > 0 ? 3.2 + pulse * 9 : 2.8;
-    const alpha = route.alpha * (hit > 0 ? 0.55 + pulse * 0.45 : 0.35);
+    const baseAlpha = route.alpha * 0.32;
 
     ctx.save();
-    ctx.shadowColor = "rgba(87,230,217,.55)";
-    ctx.shadowBlur = hit > 0 ? 10 + pulse * 18 : 4;
-    ctx.strokeStyle = `rgba(87,230,217,${alpha})`;
-    ctx.fillStyle = `rgba(7,11,22,${0.45 + pulse * 0.25})`;
-    ctx.lineWidth = 1.3 + pulse * 0.8;
 
+    ctx.fillStyle = `rgba(87,230,217,${baseAlpha})`;
     ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.arc(x, y, 2.8, 0, Math.PI * 2);
     ctx.fill();
-    ctx.stroke();
+
+    if (rippleProgress !== null) {
+      const eased = 1 - Math.pow(1 - rippleProgress, 3);
+      const rippleRadius = 4 + eased * 28;
+      const rippleAlpha = route.alpha * (1 - rippleProgress) * 0.72;
+
+      ctx.shadowColor = "rgba(87,230,217,.55)";
+      ctx.shadowBlur = 14;
+
+      ctx.strokeStyle = `rgba(87,230,217,${rippleAlpha})`;
+      ctx.lineWidth = 1.8 * (1 - rippleProgress) + 0.4;
+
+      ctx.beginPath();
+      ctx.arc(x, y, rippleRadius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, rippleRadius);
+      glow.addColorStop(0, `rgba(87,230,217,${rippleAlpha * 0.18})`);
+      glow.addColorStop(0.55, `rgba(87,230,217,${rippleAlpha * 0.08})`);
+      glow.addColorStop(1, "rgba(87,230,217,0)");
+
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, rippleRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     ctx.restore();
   }
