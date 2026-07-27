@@ -58,39 +58,23 @@ body{
 @keyframes mapDrift{
   0%{transform:rotate(-18deg) skewX(-18deg) scaleY(.55) translate3d(0,0,0)}
   100%{transform:rotate(-18deg) skewX(-18deg) scaleY(.55) translate3d(-18px,-10px,0)}
+}
 .map-layer .major{
-
   fill:none;
-
   stroke:rgba(190,225,255,.34);
-
   stroke-width:4;
-
   stroke-linecap:round;
-
 }
-
 .map-layer .road{
-
   fill:none;
-
   stroke:rgba(230,245,255,.16);
-
   stroke-width:2;
-
   stroke-linecap:round;
-
 }
-
 .map-layer .node{
-
   fill:rgba(230,245,255,.35);
-
   stroke:rgba(87,230,217,.45);
-
   stroke-width:2;
-
-}
 }
 .map-layer .label{
   fill:rgba(255,255,255,.24);
@@ -108,19 +92,21 @@ body{
   opacity:.82;
 }
 .compass{
-  position:fixed;
-  right:clamp(18px,5vw,70px);
-  bottom:clamp(18px,5vw,64px);
-  width:min(280px,42vw);
+  position:absolute;
+  left:-48px;
+  top:50%;
+  width:190px;
   aspect-ratio:1;
   z-index:0;
   pointer-events:none;
-  opacity:.28;
+  opacity:.3;
+  transform:translateY(-50%);
+  mask-image:radial-gradient(circle,black 0 50%,rgba(0,0,0,.72) 66%,transparent 78%);
 }
 .compass svg{
   width:100%;
   height:100%;
-  filter:drop-shadow(0 0 24px rgba(87,230,217,.18));
+  filter:drop-shadow(0 0 20px rgba(87,230,217,.22));
   transform:rotate(var(--compass-rotate, 0deg)) scale(var(--compass-scale, 1));
   transition:transform .28s ease-out;
   will-change:transform;
@@ -146,6 +132,33 @@ body{
   font-weight:700;
   letter-spacing:.12em;
 }
+.compass .radar-sweep{
+  transform-origin:130px 130px;
+  animation:radarSweep 8s linear infinite;
+}
+.compass .radar-beam{
+  fill:rgba(87,230,217,.14);
+}
+.compass .radar-line{
+  stroke:rgba(87,230,217,.62);
+  stroke-width:1.4;
+  stroke-linecap:round;
+}
+.compass .radar-pulse{
+  fill:none;
+  stroke:rgba(122,184,255,.48);
+  stroke-width:1.4;
+  transform-origin:130px 130px;
+  animation:radarPulse 3.6s ease-out infinite;
+}
+@keyframes radarSweep{
+  to{transform:rotate(360deg)}
+}
+@keyframes radarPulse{
+  0%{transform:scale(.36);opacity:0}
+  18%{opacity:.8}
+  82%,100%{transform:scale(1);opacity:0}
+}
 .shell{
   position:relative;
   z-index:1;
@@ -153,16 +166,28 @@ body{
   margin:0 auto;
 }
 header{
+  position:relative;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:24px;
   padding:34px 0;
 }
+.brand-lockup{
+  position:relative;
+  isolation:isolate;
+  display:flex;
+  align-items:center;
+  min-height:72px;
+}
 .logo{
+  position:relative;
+  z-index:1;
   font-size:.92rem;
   letter-spacing:.2em;
   font-weight:700;
   color:rgba(255,255,255,.9);
+  text-shadow:0 2px 16px rgba(7,11,22,.95);
 }
 .status{
   padding:9px 14px;
@@ -306,11 +331,17 @@ footer a{
   .panel-grid{grid-template-columns:1fr}
   h1{font-size:clamp(3rem,16vw,5rem)}
   .map-layer{opacity:.14}
+  header{padding:22px 0}
+  .brand-lockup{min-height:64px}
+  .compass{left:-40px;width:156px;opacity:.26}
+  .logo{max-width:210px;font-size:.78rem;line-height:1.5}
+  .status{font-size:.78rem;padding:8px 11px;white-space:nowrap}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .route-canvas{display:none}
   .map-layer svg{animation:none!important}
+  .compass{opacity:.22}
 }
 </style>
 </head>
@@ -345,33 +376,39 @@ footer a{
 
 <canvas class="route-canvas" id="routeCanvas" aria-hidden="true"></canvas>
 
-<div class="compass" aria-hidden="true">
-  <svg viewBox="0 0 260 260">
-    <circle class="ring" cx="130" cy="130" r="112"/>
-    <circle class="ring" cx="130" cy="130" r="82"/>
-    <line class="tick" x1="130" y1="12" x2="130" y2="34"/>
-    <line class="tick" x1="130" y1="226" x2="130" y2="248"/>
-    <line class="tick" x1="12" y1="130" x2="34" y2="130"/>
-    <line class="tick" x1="226" y1="130" x2="248" y2="130"/>
-    <line class="tick" x1="47" y1="47" x2="62" y2="62"/>
-    <line class="tick" x1="198" y1="198" x2="213" y2="213"/>
-    <line class="tick" x1="213" y1="47" x2="198" y2="62"/>
-    <line class="tick" x1="62" y1="198" x2="47" y2="213"/>
-    <polygon class="needle" points="130,35 148,130 130,225 112,130"/>
-    <polygon class="needle-alt" points="35,130 130,112 225,130 130,148"/>
-    <circle cx="130" cy="130" r="7" fill="rgba(255,255,255,.55)"/>
-    <text x="130" y="28" text-anchor="middle">N</text>
-    <text x="130" y="246" text-anchor="middle">S</text>
-    <text x="27" y="136" text-anchor="middle">W</text>
-    <text x="233" y="136" text-anchor="middle">E</text>
-  </svg>
-</div>
-
 <div class="noise"></div>
 
 <div class="shell">
   <header>
-    <div class="logo">OPEN ROAD TECHNOLOGIES</div>
+    <div class="brand-lockup">
+      <div class="compass" aria-hidden="true">
+        <svg viewBox="0 0 260 260">
+          <circle class="ring" cx="130" cy="130" r="112"/>
+          <circle class="ring" cx="130" cy="130" r="82"/>
+          <circle class="radar-pulse" cx="130" cy="130" r="108"/>
+          <line class="tick" x1="130" y1="12" x2="130" y2="34"/>
+          <line class="tick" x1="130" y1="226" x2="130" y2="248"/>
+          <line class="tick" x1="12" y1="130" x2="34" y2="130"/>
+          <line class="tick" x1="226" y1="130" x2="248" y2="130"/>
+          <line class="tick" x1="47" y1="47" x2="62" y2="62"/>
+          <line class="tick" x1="198" y1="198" x2="213" y2="213"/>
+          <line class="tick" x1="213" y1="47" x2="198" y2="62"/>
+          <line class="tick" x1="62" y1="198" x2="47" y2="213"/>
+          <polygon class="needle" points="130,35 148,130 130,225 112,130"/>
+          <polygon class="needle-alt" points="35,130 130,112 225,130 130,148"/>
+          <g class="radar-sweep">
+            <path class="radar-beam" d="M130 130 L130 22 A108 108 0 0 1 184 36 Z"/>
+            <line class="radar-line" x1="130" y1="130" x2="130" y2="22"/>
+          </g>
+          <circle cx="130" cy="130" r="7" fill="rgba(255,255,255,.55)"/>
+          <text x="130" y="28" text-anchor="middle">N</text>
+          <text x="130" y="246" text-anchor="middle">S</text>
+          <text x="27" y="136" text-anchor="middle">W</text>
+          <text x="233" y="136" text-anchor="middle">E</text>
+        </svg>
+      </div>
+      <div class="logo">OPEN ROAD TECHNOLOGIES</div>
+    </div>
     <div class="status">UK Software Company</div>
   </header>
 
