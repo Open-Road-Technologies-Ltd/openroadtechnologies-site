@@ -99,7 +99,7 @@ body{
   aspect-ratio:1;
   z-index:0;
   pointer-events:none;
-  opacity:.3;
+  opacity:.36;
   transform:translateY(-50%);
   mask-image:radial-gradient(circle,black 0 50%,rgba(0,0,0,.72) 66%,transparent 78%);
 }
@@ -146,18 +146,33 @@ body{
 }
 .compass .radar-pulse{
   fill:none;
-  stroke:rgba(122,184,255,.48);
-  stroke-width:1.4;
+  stroke:rgba(122,184,255,.92);
+  stroke-width:2;
+  transform-box:view-box;
   transform-origin:130px 130px;
-  animation:radarPulse 3.6s ease-out infinite;
+  animation:radarPulse 3.2s cubic-bezier(.16,.72,.28,1) infinite;
+}
+.compass .radar-pulse-secondary{
+  stroke:rgba(87,230,217,.76);
+  animation-delay:1.6s;
+}
+.compass .radar-core{
+  fill:rgba(247,251,255,.9);
+  transform-box:view-box;
+  transform-origin:130px 130px;
+  animation:radarCore 1.6s ease-in-out infinite;
 }
 @keyframes radarSweep{
   to{transform:rotate(360deg)}
 }
 @keyframes radarPulse{
-  0%{transform:scale(.36);opacity:0}
-  18%{opacity:.8}
+  0%{transform:scale(.14);opacity:0}
+  12%{opacity:1}
   82%,100%{transform:scale(1);opacity:0}
+}
+@keyframes radarCore{
+  0%,100%{transform:scale(.72);opacity:.55}
+  50%{transform:scale(1.18);opacity:1}
 }
 .shell{
   position:relative;
@@ -386,6 +401,7 @@ footer a{
           <circle class="ring" cx="130" cy="130" r="112"/>
           <circle class="ring" cx="130" cy="130" r="82"/>
           <circle class="radar-pulse" cx="130" cy="130" r="108"/>
+          <circle class="radar-pulse radar-pulse-secondary" cx="130" cy="130" r="108"/>
           <line class="tick" x1="130" y1="12" x2="130" y2="34"/>
           <line class="tick" x1="130" y1="226" x2="130" y2="248"/>
           <line class="tick" x1="12" y1="130" x2="34" y2="130"/>
@@ -400,7 +416,7 @@ footer a{
             <path class="radar-beam" d="M130 130 L130 22 A108 108 0 0 1 184 36 Z"/>
             <line class="radar-line" x1="130" y1="130" x2="130" y2="22"/>
           </g>
-          <circle cx="130" cy="130" r="7" fill="rgba(255,255,255,.55)"/>
+          <circle class="radar-core" cx="130" cy="130" r="7"/>
           <text x="130" y="28" text-anchor="middle">N</text>
           <text x="130" y="246" text-anchor="middle">S</text>
           <text x="27" y="136" text-anchor="middle">W</text>
